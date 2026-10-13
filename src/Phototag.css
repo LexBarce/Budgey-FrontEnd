@@ -1,0 +1,324 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.tag {
+  /* Colors */
+  --sheet: #f3eee3;
+  --field: #ebe3d6;
+  --field-border: #ddd2c1;
+  --ink: #1f1712;
+  --muted: #8a7f73;
+  --want: #c47a1c;
+  --reward: #8c6b3f;
+  --need: #1b7a3c;
+
+  /* Sizes: tweak these first */
+  --pad-x: 45px;       /* space on the left and right of the sheet */
+  --input-h: 38px;     /* height of the input boxes */
+  --field-gap: 14px;   /* space between fields */
+  --overlap: 28px;     /* how far the sheet covers the photo */
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 400px;
+  height: 100dvh;
+  max-height: 874px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #110a06;
+  font-family: "Poppins", system-ui, sans-serif;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.tag *,
+.tag *::before,
+.tag *::after {
+  box-sizing: border-box;
+}
+
+/* ---- Photo: fills the whole area above the sheet ---- */
+.tag__photo {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.tag__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ---- Sheet: overlaps the bottom of the photo ---- */
+.sheet {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 100%;
+  margin-top: calc(var(--overlap) * -1);
+  padding: 12px var(--pad-x) 32px;
+  background: var(--sheet);
+  border-radius: 28px 28px 0 0;
+}
+
+.sheet__handle {
+  display: block;
+  width: 44px;
+  height: 5px;
+  margin: 0 auto 14px;
+  border-radius: 99px;
+  background: #cfc6b8;
+}
+
+.sheet__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sheet__pill {
+  padding: 9px 16px;
+  border-radius: 99px;
+  background: #241f1b;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.sheet__close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #e6dfd2;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sheet__title {
+  margin: 10px 0 16px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Fields ---- */
+.field {
+  display: block;
+  min-width: 0;
+  margin-bottom: var(--field-gap);
+}
+.field__label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.box {
+  width: 100%;
+  height: var(--input-h);
+  padding: 0 14px;
+  border: 1px solid var(--field-border);
+  border-radius: 10px;
+  background: var(--field);
+  color: var(--ink);
+  font: 600 12px "Poppins", system-ui, sans-serif;
+}
+.box::placeholder,
+.box input::placeholder {
+  color: #b3a898;
+  font-weight: 500;
+}
+.box:focus-visible,
+.box:focus-within {
+  outline: 2px solid var(--want);
+  outline-offset: 1px;
+}
+
+/* Amount is narrower than category (minmax keeps it inside the sheet) */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.64fr) minmax(0, 1fr);
+  gap: 13px;
+}
+
+.box--money,
+.box--other {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.box--money input,
+.box--other input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+/* ---- Category dropdown ---- */
+.field--category {
+  position: relative;
+}
+
+.box--select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+  cursor: pointer;
+  text-align: center;
+}
+.box--select .is-placeholder {
+  color: #9c9183;
+  font-weight: 500;
+}
+
+.box__chev {
+  position: absolute;
+  right: 12px;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.box--other {
+  position: relative;
+  padding-right: 34px;
+}
+.box__other-label {
+  white-space: nowrap;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  border: 1px solid var(--field-border);
+  border-radius: 10px;
+  background: #ece2d2;
+  box-shadow: 0 8px 20px rgba(40, 25, 10, 0.18);
+}
+.menu button {
+  width: 100%;
+  padding: 7px 0 7px 36px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font: 600 11px "Poppins", system-ui, sans-serif;
+  cursor: pointer;
+}
+.menu button:hover,
+.menu button:focus-visible {
+  background: rgba(0, 0, 0, 0.06);
+}
+.menu .is-selected button {
+  font-weight: 700;
+}
+
+/* ---- Reason ---- */
+.reason {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  border: 1px solid var(--field-border);
+  border-radius: 10px;
+  background: var(--field);
+}
+.reason__text strong {
+  display: block;
+  max-width: 140px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.reason__text small {
+  font-size: 8.5px;
+  color: var(--muted);
+}
+
+.reason__btn {
+  flex: none;
+  width: 104px;
+  height: 38px;
+  padding: 0;
+  border: 1.5px solid #2a1d10;
+  border-radius: 9px;
+  color: #fff;
+  font: 700 13px "Poppins", system-ui, sans-serif;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.reason__btn--want   { background: var(--want); }
+.reason__btn--reward { background: var(--reward); }
+.reason__btn--need   { background: var(--need); border-color: #0f3d1c; }
+
+.reason__dots {
+  display: flex;
+  gap: 3px;
+}
+.reason__dots i {
+  width: 5px;
+  height: 5px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
+.reason__dots i.on {
+  background: #fff;
+}
+
+/* ---- Add to Gallery ---- */
+.sheet__save {
+  width: 100%;
+  height: 52px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 12px;
+  background: #241f1b;
+  color: #fff;
+  font: 600 16px "Poppins", system-ui, sans-serif;
+  cursor: pointer;
+}
+.sheet__save:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tag button:focus-visible {
+  outline: 3px solid var(--want);
+  outline-offset: 2px;
+}
