@@ -45,13 +45,13 @@ html, body, #root {
   color: var(--cream);
 }
 
-.camera__ring {
-  width: 20px;
-  height: 20px;
+.camera__upload {
+  display: grid;
+  place-items: center;
   padding: 0;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.08);
+  border: 0;
   background: transparent;
+  color: var(--cream);
   cursor: pointer;
 }
 
@@ -59,7 +59,6 @@ html, body, #root {
   position: relative;
   margin: 72px var(--side-margin) 0;
   aspect-ratio: 4 / 5;
-  overflow: hidden;
   background: #2a1d15;
 }
 
@@ -167,4 +166,22 @@ html, body, #root {
 button:focus-visible {
   outline: 3px solid var(--bracket);
   outline-offset: 3px;
+}
+
+.viewfinder__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  z-index: 2;
+  margin: 0;
+  width: 200px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 99px;
+  background: #2b2a29;
+  color: #b8b0a6;
+  font-size: 12px;
+  font-weight: 500;
 }

@@ -1,12 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import "./Camera.css";
 
-export default function Camera({ onCapture }) {
+export default function Camera({ onCapture, onOpenGallery, latestPhoto }) {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const fileRef = useRef(null);
   const [facing, setFacing] = useState("environment");
   const [cameraError, setCameraError] = useState(false);
-  const [lastPhoto, setLastPhoto] = useState(null);
+
+  const handleUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => onCapture?.(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = ""; // lets you pick the same file again later
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -52,7 +61,6 @@ export default function Camera({ onCapture }) {
     canvas.getContext("2d").drawImage(video, 0, 0);
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-    setLastPhoto(dataUrl);
     onCapture?.(dataUrl);
   };
 
@@ -60,7 +68,28 @@ export default function Camera({ onCapture }) {
     <main className="camera">
       <header className="camera__header">
         <h1 className="camera__logo">budgey</h1>
-        <button className="camera__ring" aria-label="Camera settings" />
+
+        <button
+          className="camera__upload"
+          onClick={() => fileRef.current?.click()}
+          aria-label="Upload a photo"
+        >
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none"
+              stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
+              strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 15V3" />
+            <path d="M7.5 7.5 12 3l4.5 4.5" />
+            <path d="M5 11H4.5A1.5 1.5 0 0 0 3 12.5v7A1.5 1.5 0 0 0 4.5 21h15a1.5 1.5 0 0 0 1.5-1.5v-7a1.5 1.5 0 0 0-1.5-1.5H19" />
+          </svg>
+        </button>
+
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={handleUpload}
+        />
       </header>
 
       <section className="viewfinder" aria-label="Camera preview">
@@ -89,8 +118,12 @@ export default function Camera({ onCapture }) {
       </section>
 
       <footer className="controls">
-        <button className="controls__gallery" aria-label="Open gallery">
-          {lastPhoto && <img src={lastPhoto} alt="Last photo taken" />}
+        <button
+          className="controls__gallery"
+          aria-label="Open gallery"
+          onClick={onOpenGallery}
+        >
+          {latestPhoto && <img src={latestPhoto} alt="Latest photo" />}
         </button>
 
         <button
