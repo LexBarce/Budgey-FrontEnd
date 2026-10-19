@@ -34,6 +34,7 @@ function shrinkPhoto(dataUrl, maxSide = 900) {
 export default function App() {
   const [screen, setScreen] = useState("camera");
   const [pendingPhoto, setPendingPhoto] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [entries, setEntries] = useState(loadEntries);
 
   useEffect(() => {
@@ -59,6 +60,27 @@ export default function App() {
     setScreen("gallery");
   };
 
+  const updateEntry = (id, changes) => {
+    setEntries((prev) =>
+      prev.map((e) =>
+        e.id === id
+          ? {
+              ...e,
+              name: changes.name,
+              amount: changes.amount,
+              category: changes.category,
+              reason: changes.reason,
+            }
+          : e
+      )
+    );
+    setEditing(null);
+  };
+
+  const deleteEntry = (id) =>
+    setEntries((prev) => prev.filter((e) => e.id !== id));
+
+  // New photo: tag it
   if (pendingPhoto) {
     return (
       <PhotoTag
@@ -69,8 +91,28 @@ export default function App() {
     );
   }
 
+  // Existing photo: edit its details
+  if (editing) {
+    return (
+      <PhotoTag
+        photo={editing.photo}
+        initial={editing}
+        submitLabel="Save changes"
+        onClose={() => setEditing(null)}
+        onSave={(changes) => updateEntry(editing.id, changes)}
+      />
+    );
+  }
+
   if (screen === "gallery") {
-    return <Gallery entries={entries} onNavigate={setScreen} />;
+    return (
+      <Gallery
+        entries={entries}
+        onNavigate={setScreen}
+        onDelete={deleteEntry}
+        onEdit={setEditing}
+      />
+    );
   }
 
   return (

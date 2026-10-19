@@ -28,13 +28,24 @@ function Chevron({ up }) {
   );
 }
 
-export default function PhotoTag({ photo, onClose, onSave }) {
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [otherMode, setOtherMode] = useState(false);
+export default function PhotoTag({
+  photo,
+  initial,
+  submitLabel = "Add to Gallery",
+  onClose,
+  onSave,
+}) {
+  const startsOther =
+    !!initial && !CATEGORIES.slice(0, -1).includes(initial.category);
+
+  const [name, setName] = useState(initial?.name ?? "");
+  const [amount, setAmount] = useState(initial ? String(initial.amount) : "");
+  const [category, setCategory] = useState(initial?.category ?? "");
+  const [otherMode, setOtherMode] = useState(startsOther);
   const [open, setOpen] = useState(false);
-  const [reasonIndex, setReasonIndex] = useState(0);
+  const [reasonIndex, setReasonIndex] = useState(
+    Math.max(0, REASONS.findIndex((r) => r.label === initial?.reason))
+  );
 
   const categoryRef = useRef(null);
   const reason = REASONS[reasonIndex];
@@ -95,8 +106,6 @@ export default function PhotoTag({ photo, onClose, onSave }) {
       </div>
 
       <section className="sheet" aria-label="Tag this photo">
-        <span className="sheet__handle" aria-hidden="true" />
-
         <div className="sheet__top">
           <span className="sheet__pill">TAG THIS PHOTO</span>
           <button className="sheet__close" onClick={onClose} aria-label="Close">
@@ -216,7 +225,7 @@ export default function PhotoTag({ photo, onClose, onSave }) {
         </div>
 
         <button className="sheet__save" onClick={save} disabled={!canSave}>
-          Add to Gallery
+          {submitLabel}
         </button>
       </section>
     </main>

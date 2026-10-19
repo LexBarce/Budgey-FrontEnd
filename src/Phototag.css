@@ -13,11 +13,9 @@
 
   /* Sizes: tweak these first */
   --pad-x: 45px;       /* space on the left and right of the sheet */
-  --input-h: 38px;     /* height of the input boxes */
   --field-gap: 14px;   /* space between fields */
   --overlap: 28px;     /* how far the sheet covers the photo */
 
-  box-sizing: border-box;
   width: 100%;
   max-width: 400px;
   height: 100dvh;
@@ -29,12 +27,6 @@
   font-family: "Poppins", system-ui, sans-serif;
   color: var(--ink);
   overflow: hidden;
-}
-
-.tag *,
-.tag *::before,
-.tag *::after {
-  box-sizing: border-box;
 }
 
 /* ---- Photo: fills the whole area above the sheet ---- */
@@ -59,18 +51,9 @@
   flex: none;
   width: 100%;
   margin-top: calc(var(--overlap) * -1);
-  padding: 12px var(--pad-x) 32px;
+  padding: 26px var(--pad-x) 32px;
   background: var(--sheet);
   border-radius: 28px 28px 0 0;
-}
-
-.sheet__handle {
-  display: block;
-  width: 44px;
-  height: 5px;
-  margin: 0 auto 14px;
-  border-radius: 99px;
-  background: #cfc6b8;
 }
 
 .sheet__top {
@@ -103,7 +86,7 @@
 }
 
 .sheet__title {
-  margin: 10px 0 16px;
+  margin: 12px 0 8px;   /* last number = space between title and Item Name */
   font-size: 32px;
   font-weight: 700;
   line-height: 1.1;
@@ -127,7 +110,7 @@
 
 .box {
   width: 100%;
-  height: var(--input-h);
+  height: 40px;
   padding: 0 14px;
   border: 1px solid var(--field-border);
   border-radius: 10px;
@@ -146,11 +129,14 @@
   outline-offset: 1px;
 }
 
-/* Amount is narrower than category (minmax keeps it inside the sheet) */
+/* Amount is narrower than category */
 .row {
   display: grid;
   grid-template-columns: minmax(0, 0.64fr) minmax(0, 1fr);
   gap: 13px;
+}
+.row .box {
+  height: 36px;
 }
 
 .box--money,

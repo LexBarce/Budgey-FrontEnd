@@ -8,6 +8,7 @@ export default function Camera({ onCapture, onOpenGallery, latestPhoto }) {
   const [facing, setFacing] = useState("environment");
   const [cameraError, setCameraError] = useState(false);
 
+  // Photo picked from the upload button
   const handleUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -23,10 +24,20 @@ export default function Camera({ onCapture, onOpenGallery, latestPhoto }) {
     async function startCamera() {
       try {
         streamRef.current?.getTracks().forEach((t) => t.stop());
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: facing },
-          audio: false,
-        });
+
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: facing } },
+            audio: false,
+          });
+        } catch {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+        }
+
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop());
           return;
@@ -55,13 +66,31 @@ export default function Camera({ onCapture, onOpenGallery, latestPhoto }) {
     const video = videoRef.current;
     if (!video || cameraError || !video.videoWidth) return;
 
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0);
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-    onCapture?.(dataUrl);
+    // Crop to 4:5 so the photo matches the viewfinder box
+    const ratio = 4 / 5;
+    let sw = vw;
+    let sh = vh;
+    if (vw / vh > ratio) sw = vh * ratio;
+    else sh = vw / ratio;
+    const sx = (vw - sw) / 2;
+    const sy = (vh - sh) / 2;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = sw;
+    canvas.height = sh;
+    const ctx = canvas.getContext("2d");
+
+    // The front camera preview is mirrored, so mirror the photo too
+    if (facing === "user") {
+      ctx.translate(sw, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    onCapture?.(canvas.toDataURL("image/jpeg", 0.9));
   };
 
   return (
@@ -75,8 +104,8 @@ export default function Camera({ onCapture, onOpenGallery, latestPhoto }) {
           aria-label="Upload a photo"
         >
           <svg viewBox="0 0 24 24" width="32" height="32" fill="none"
-              stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
-              strokeLinejoin="round" aria-hidden="true">
+               stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
+               strokeLinejoin="round" aria-hidden="true">
             <path d="M12 15V3" />
             <path d="M7.5 7.5 12 3l4.5 4.5" />
             <path d="M5 11H4.5A1.5 1.5 0 0 0 3 12.5v7A1.5 1.5 0 0 0 4.5 21h15a1.5 1.5 0 0 0 1.5-1.5v-7a1.5 1.5 0 0 0-1.5-1.5H19" />
@@ -107,14 +136,18 @@ export default function Camera({ onCapture, onOpenGallery, latestPhoto }) {
           />
         )}
 
+        {/* Rule-of-thirds grid */}
         <div className="viewfinder__grid" aria-hidden="true">
           <span /> <span /> <span /> <span />
         </div>
 
+        {/* Corner brackets */}
         <i className="corner corner--tl" aria-hidden="true" />
         <i className="corner corner--tr" aria-hidden="true" />
         <i className="corner corner--bl" aria-hidden="true" />
         <i className="corner corner--br" aria-hidden="true" />
+
+        <p className="viewfinder__hint">One item at a time</p>
       </section>
 
       <footer className="controls">

@@ -1,6 +1,5 @@
-
 import { useEffect, useMemo, useState } from "react";
-import BottomNav from "./Bottomnav";
+import BottomNav from "./BottomNav";
 import "./Gallery.css";
 
 const MONTHS = [
@@ -24,9 +23,16 @@ const formatDate = (iso) => {
   return `${mm}/${dd}/${d.getFullYear()}`;
 };
 
-export default function Gallery({ entries, onNavigate }) {
+const formatTime = (iso) =>
+  new Date(iso).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+export default function Gallery({ entries, onNavigate, onDelete, onEdit }) {
   const [selected, setSelected] = useState(null);
   const [viewing, setViewing] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   // Group photos by month, newest first
   const groups = useMemo(() => {
@@ -67,16 +73,26 @@ export default function Gallery({ entries, onNavigate }) {
     return { total, byReason, top };
   }, [entries]);
 
-  // Escape closes the full photo first, then the details card
+  // Escape closes the newest layer first
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== "Escape") return;
-      if (viewing) setViewing(false);
+      if (confirming) setConfirming(false);
+      else if (viewing) setViewing(false);
       else setSelected(null);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [viewing]);
+  }, [viewing, confirming]);
+
+  const confirmDelete = () => {
+    onDelete?.(selected.id);
+    setConfirming(false);
+    setViewing(false);
+    setSelected(null);
+  };
+
+  const selDate = selected ? new Date(selected.createdAt) : null;
 
   return (
     <main className="gallery">
@@ -196,17 +212,71 @@ export default function Gallery({ entries, onNavigate }) {
         </div>
       )}
 
-      {/* Full photo */}
+      {/* Full photo screen */}
       {selected && viewing && (
-        <div className="viewer" onClick={() => setViewing(false)}>
-          <img src={selected.photo} alt={selected.name} />
-          <button
-            className="viewer__close"
-            onClick={() => setViewing(false)}
-            aria-label="Close photo"
-          >
-            ×
-          </button>
+        <div className="viewer" role="dialog" aria-modal="true" aria-label="Photo">
+          <header className="viewer__head">
+            <button
+              className="viewer__back"
+              onClick={() => setViewing(false)}
+              aria-label="Back"
+            >
+              <svg width="34" height="24" viewBox="0 0 34 24" fill="none"
+                   stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                   strokeLinejoin="round" aria-hidden="true">
+                <path d="M32 12H3" />
+                <path d="M12 3 3 12l9 9" />
+              </svg>
+            </button>
+            <div>
+              <strong>
+                {MONTHS[selDate.getMonth()]}, {selDate.getFullYear()}
+              </strong>
+              <span>{formatTime(selected.createdAt)}</span>
+            </div>
+          </header>
+
+          <div className="viewer__photo">
+            <img src={selected.photo} alt={selected.name} />
+          </div>
+
+          <footer className="viewer__bar">
+            <button onClick={() => setConfirming(true)}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M9 2h6l1 2h4a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2h4l1-2z" />
+                <path d="M5 8h14l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 8zm4 3v8h2v-8H9zm4 0v8h2v-8h-2z" fillRule="evenodd" />
+              </svg>
+              Delete
+            </button>
+            <button onClick={() => onEdit?.(selected)}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                   strokeLinejoin="round" aria-hidden="true">
+                <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
+                <path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 8 16l1.2-4 9.2-9.4z" />
+              </svg>
+              Edit Details
+            </button>
+          </footer>
+
+          {confirming && (
+            <div className="confirm" onClick={() => setConfirming(false)}>
+              <div
+                className="confirm__box"
+                role="alertdialog"
+                aria-label="Delete selected item?"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p>Delete selected item?</p>
+                <div className="confirm__actions">
+                  <button onClick={() => setConfirming(false)}>CANCEL</button>
+                  <button className="is-danger" onClick={confirmDelete}>
+                    DELETE
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </main>

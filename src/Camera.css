@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap");
 
+/* ---- Tweak these first ---- */
 .camera {
   --bg: #110a06;
   --cream: #f4e8dd;
@@ -17,7 +18,6 @@ html, body, #root {
 }
 
 .camera {
-  box-sizing: border-box;
   width: 100%;
   max-width: 400px;
   height: 100dvh;
@@ -30,11 +30,12 @@ html, body, #root {
   font-family: "Poppins", system-ui, sans-serif;
 }
 
+/* ---- Header ---- */
 .camera__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 64px var(--side-margin) 0;
+  padding: clamp(24px, 7dvh, 64px) var(--side-margin) 0;
 }
 
 .camera__logo {
@@ -55,9 +56,10 @@ html, body, #root {
   cursor: pointer;
 }
 
+/* ---- Viewfinder ---- */
 .viewfinder {
   position: relative;
-  margin: 72px var(--side-margin) 0;
+  margin: clamp(20px, 8dvh, 72px) var(--side-margin) 0;
   aspect-ratio: 4 / 5;
   background: #2a1d15;
 }
@@ -85,6 +87,7 @@ html, body, #root {
   color: rgba(244, 232, 221, 0.7);
 }
 
+/* Rule-of-thirds grid: 2 vertical + 2 horizontal lines */
 .viewfinder__grid span {
   position: absolute;
   background: var(--grid-line);
@@ -94,6 +97,7 @@ html, body, #root {
 .viewfinder__grid span:nth-child(3) { top: 33.333%; left: 0; right: 0; height: 1px; }
 .viewfinder__grid span:nth-child(4) { top: 66.666%; left: 0; right: 0; height: 1px; }
 
+/* Corner brackets */
 .corner {
   position: absolute;
   width: 18px;
@@ -105,9 +109,29 @@ html, body, #root {
 .corner--bl { bottom: 0; left: 0;  border-bottom-width: 3px; border-left-width: 3px; }
 .corner--br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; }
 
+/* "One item at a time" pill, straddling the bottom edge */
+.viewfinder__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  z-index: 2;
+  margin: 0;
+  width: 200px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 99px;
+  background: #2b2a29;
+  color: #b8b0a6;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---- Bottom controls ---- */
 .controls {
   margin-top: auto;
-  padding: 0 var(--side-margin) 48px;
+  padding: 0 var(--side-margin) clamp(20px, 5dvh, 48px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -166,22 +190,4 @@ html, body, #root {
 button:focus-visible {
   outline: 3px solid var(--bracket);
   outline-offset: 3px;
-}
-
-.viewfinder__hint {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translate(-50%, 50%);
-  z-index: 2;
-  margin: 0;
-  width: 200px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 99px;
-  background: #2b2a29;
-  color: #b8b0a6;
-  font-size: 12px;
-  font-weight: 500;
 }
